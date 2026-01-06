@@ -6,12 +6,13 @@ import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, doc, 
 
 // ▼【重要】ここはあなたの設定のままにしてください！
 const firebaseConfig = {
-  apiKey: "AIzaSy...", 
-  authDomain: "...",
-  projectId: "...",
-  storageBucket: "...",
-  messagingSenderId: "...",
-  appId: "..."
+  apiKey: "AIzaSyAkmHUutBh7YcS3Fj6Aqf8P_BqeiU21n7U",
+  authDomain: "rpg-exploration.firebaseapp.com",
+  projectId: "rpg-exploration",
+  storageBucket: "rpg-exploration.firebasestorage.app",
+  messagingSenderId: "553953765804",
+  appId: "1:553953765804:web:d2a7a8770c2fd958017209",
+  measurementId: "G-067NQE1HMZ"
 };
 
 const app = initializeApp(firebaseConfig);
