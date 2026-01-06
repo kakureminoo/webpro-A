@@ -1,0 +1,339 @@
+/* === 全体のレイアウト === */
+:root {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background-color: #242424; /* 背景色（ダークモード風） */
+  color: rgba(255, 255, 255, 0.87);
+}
+
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center; /* 画面の左右中央 */
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+  max-width: 800px; /* コンテンツの最大幅 */
+  padding: 2rem;
+  text-align: center; /* テキストの中央揃え */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 子要素（キャンバスなど）を中央配置 */
+}
+
+/* === スタート画面 === */
+.start-screen {
+  display: flex;
+  flex-direction: column; /* 縦並び */
+  align-items: center;    /* 水平方向の中央揃え */
+  justify-content: center;/* 垂直方向の中央揃え */
+  height: 80vh;           /* 画面の高さを確保 */
+  width: 100%;
+}
+
+.game-title {
+  font-size: 4em;
+  margin-bottom: 60px;
+  color: #646cff;
+  text-shadow: 2px 2px 0px #fff;
+  line-height: 1.1;
+}
+
+/* ボタンを縦に並べるコンテナ */
+.menu-buttons {
+  display: flex;
+  flex-direction: column; /* 縦並びにする重要な指定 */
+  gap: 20px;              /* ボタン間の隙間 */
+  width: 100%;
+  max-width: 300px;       /* ボタンの最大幅 */
+}
+
+/* === ボタン共通デザイン === */
+button {
+  cursor: pointer;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-weight: bold;
+  font-family: inherit;
+  transition: transform 0.1s, background-color 0.2s;
+  width: 100%; /* 親コンテナいっぱいに広げる */
+}
+
+button:active {
+  transform: scale(0.96);
+}
+
+/* スタートボタン */
+.btn-primary {
+  font-size: 1.5em;
+  background-color: #646cff;
+  color: white;
+}
+.btn-primary:hover {
+  background-color: #535bf2;
+}
+
+/* 概要ボタン */
+.btn-secondary {
+  font-size: 1.2em;
+  background-color: #1a1a1a;
+  color: #fff;
+  border: 1px solid #646cff;
+}
+.btn-secondary:hover {
+  background-color: #333;
+}
+
+/* 探索ボタン */
+.btn-explore {
+  font-size: 1.2em;
+  background-color: #ffcc00;
+  color: #333;
+  width: auto; /* 探索ボタンだけは幅自動 */
+  min-width: 200px;
+}
+.btn-explore:hover {
+  background-color: #ffd633;
+}
+
+/* === ゲーム画面のヘッダー === */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 560px; /* マップの幅に合わせる */
+  margin-bottom: 10px;
+}
+
+/* === モーダル（説明画面） === */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #333;
+  padding: 40px;
+  border-radius: 12px;
+  max-width: 400px;
+  border: 2px solid #646cff;
+  color: white;
+  text-align: center; /* モーダル内も中央揃え */
+}
+.modal-content h2 {
+  margin-top: 0;
+  border-bottom: 1px solid #666;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+.modal-content p {
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+.modal-content button {
+  width: auto; /* 閉じるボタンは幅自動 */
+  min-width: 120px;
+  margin: 0 auto;
+}
+
+/* === ゲームクリア表示 === */
+.clear-message {
+  border: 4px solid gold;
+  padding: 20px;
+  margin: 20px auto;
+  background-color: #ffffe0;
+  color: black;
+  border-radius: 8px;
+  animation: pop 0.5s ease-out;
+  max-width: 500px;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* === 図鑑リスト === */
+.item-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+  max-width: 600px; /* 横に広がりすぎないように */
+}
+
+.item-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #555;
+  border-radius: 8px;
+  width: 100px;
+  height: 60px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.item-card.found {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.item-card.unknown {
+  background: #333;
+  color: #666;
+}
+
+/* ...既存のCSSの下に追加してください... */
+
+/* === ログイン・入力エリア === */
+.login-box {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.name-input {
+  padding: 12px;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  border: 2px solid #555;
+  background-color: #333;
+  color: white;
+  text-align: center;
+  width: 250px;
+  margin-bottom: 10px;
+}
+
+.name-input:focus {
+  outline: none;
+  border-color: #646cff;
+}
+
+.best-time {
+  color: #ffcc00;
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* === ヘッダー情報（プレイヤー名・タイマー） === */
+.game-header {
+  /* 既存のスタイルに加えて調整 */
+  background-color: #1a1a1a;
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #444;
+}
+
+.player-info {
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.timer-display {
+  font-family: 'Courier New', monospace; /* 等幅フォントで数字のブレを防ぐ */
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.time-value {
+  color: #ffcc00; /* 時間を目立たせる */
+}
+
+/* === クリアタイム表示 === */
+.clear-time-result {
+  font-size: 2rem;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  margin: 10px 0;
+  color: #646cff;
+}
+/* ...既存のCSSの下に追加... */
+
+.btn-google {
+  background-color: #4285F4;
+  color: white;
+  font-weight: bold;
+}
+.btn-google:hover {
+  background-color: #357ae8;
+}
+
+.btn-logout {
+  background-color: #555;
+  color: #ccc;
+  font-size: 0.8em;
+  padding: 5px 10px;
+  margin-top: 5px;
+  width: auto;
+}
+
+.ranking-board {
+  background: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 15px;
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 20px;
+}
+
+.ranking-board h3 {
+  margin-top: 0;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+  color: gold;
+}
+
+.ranking-board ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ranking-board li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #333;
+  font-size: 0.9rem;
+}
+
+.rank {
+  font-weight: bold;
+  color: #aaa;
+  width: 40px;
+}
+.ranking-board li:nth-child(1) .rank { color: gold; }
+.ranking-board li:nth-child(2) .rank { color: silver; }
+.ranking-board li:nth-child(3) .rank { color: #cd7f32; }
+
+.name {
+  flex-grow: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 10px;
+}
+
+.time {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+}
