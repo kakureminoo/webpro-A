@@ -1,7 +1,6 @@
-// src/App.jsx
 import { useState, useEffect } from "react";
 import Map from "./Map";
-// firebase.js から doc, getDoc, setDoc を読み込む
+// firebase.js から必要な機能を読み込み
 import { auth, provider, signInWithPopup, signOut, db, collection, addDoc, query, orderBy, limit, getDocs, doc, getDoc, setDoc } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -22,10 +21,11 @@ export default function App() {
   const [showDescription, setShowDescription] = useState(false);
   const [user, setUser] = useState(null);
   
-  // ▼ ニックネーム関連の変数を追加
   const [nickname, setNickname] = useState("");
   const [inputName, setInputName] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
+  // ▼【追加】編集モードかどうかを管理するスイッチ
+  const [isEditing, setIsEditing] = useState(false);
 
   const [ranking, setRanking] = useState([]);
   const [collectedItems, setCollectedItems] = useState([]);
@@ -38,41 +38,45 @@ export default function App() {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        // ▼ ログインしたら、ニックネーム登録済みか確認する
         const userRef = doc(db, "users", currentUser.uid);
         const userSnap = await getDoc(userRef);
 
         if (userSnap.exists()) {
-          // 登録済みならニックネームをセット
           setNickname(userSnap.data().name);
         } else {
-          // 未登録なら登録画面へ
           setIsRegistering(true);
         }
         fetchRanking();
       } else {
         setNickname("");
         setIsRegistering(false);
+        setIsEditing(false); // ログアウト時は編集モードもオフ
       }
     });
     return () => unsubscribe();
   }, []);
 
-  // ▼ ニックネームを保存する関数
+  // 名前を保存・更新する関数
   const handleRegisterName = async () => {
     if (!inputName.trim()) return alert("名前を入力してください");
     if (inputName.length > 10) return alert("名前は10文字以内でお願いします");
 
     try {
-      // データベースの "users" コレクションに保存
       await setDoc(doc(db, "users", user.uid), {
         name: inputName
       });
       setNickname(inputName);
       setIsRegistering(false);
+      setIsEditing(false); // 編集モード終了
     } catch (error) {
       console.error("Error saving nickname:", error);
     }
+  };
+
+  // ▼【追加】「変更」ボタンを押したときの処理
+  const startEditing = () => {
+    setInputName(nickname); // 今の名前を入力欄に入れておく
+    setIsEditing(true);     // 編集モードON
   };
 
   const handleLogin = async () => {
@@ -119,8 +123,8 @@ export default function App() {
       alert("ログインしてください！");
       return;
     }
-    if (isRegistering) {
-      alert("先にニックネームを決めてください！");
+    if (isRegistering || isEditing) {
+      alert("ニックネームを決めてください！");
       return;
     }
     setCollectedItems([]);
@@ -157,7 +161,7 @@ export default function App() {
     if (user) {
       try {
         await addDoc(collection(db, "scores"), {
-          name: nickname, // ▼ ここをGoogle名ではなくニックネームに変更
+          name: nickname,
           time: clearTime,
           date: new Date()
         });
@@ -175,10 +179,10 @@ export default function App() {
         
         <div className="login-box">
           {user ? (
-            isRegistering ? (
-              // ▼ ニックネーム登録フォーム
+            // ▼ ここから：編集モードか通常モードかで表示を切り替え
+            (isRegistering || isEditing) ? (
               <div className="nickname-form">
-                <p>ニックネームを決めてください</p>
+                <p>{isEditing ? "新しいニックネーム" : "ニックネームを決めてください"}</p>
                 <input 
                   type="text" 
                   placeholder="例：勇者タナカ" 
@@ -187,15 +191,28 @@ export default function App() {
                   style={{padding: "5px", fontSize: "16px"}}
                 />
                 <button onClick={handleRegisterName} className="btn-primary" style={{marginLeft:"5px"}}>
-                  決定
+                  保存
                 </button>
+                {/* 編集モードの時だけキャンセルボタンを表示 */}
+                {isEditing && (
+                  <button onClick={() => setIsEditing(false)} style={{marginLeft:"5px", fontSize:"0.8rem"}}>
+                    キャンセル
+                  </button>
+                )}
               </div>
             ) : (
               <div>
-                <p>ようこそ、<strong>{nickname}</strong> さん</p>
+                <p>
+                  ようこそ、<strong>{nickname}</strong> さん
+                  {/* 名前変更ボタン */}
+                  <button onClick={startEditing} style={{marginLeft:"10px", fontSize:"0.8rem", padding:"2px 5px"}}>
+                    名前変更
+                  </button>
+                </p>
                 <button onClick={handleLogout} className="btn-logout">ログアウト</button>
               </div>
             )
+            // ▲ ここまで変更しました
           ) : (
             <button onClick={handleLogin} className="btn-google">
               G Googleでログインして参加
@@ -218,8 +235,7 @@ export default function App() {
         </div>
 
         <div className="menu-buttons">
-          {/* ログイン済みかつ登録完了ならスタートボタン表示 */}
-          {user && !isRegistering && (
+          {user && !isRegistering && !isEditing && (
             <button onClick={startGame} className="btn-primary">
               ゲームスタート
             </button>
