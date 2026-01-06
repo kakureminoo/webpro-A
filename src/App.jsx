@@ -171,6 +171,7 @@ export default function App() {
       }
     }
   }
+  
 
   if (gamePhase === "start") {
     return (
@@ -201,14 +202,15 @@ export default function App() {
                 )}
               </div>
             ) : (
-              <div>
-                <p>
-                  ようこそ、<strong>{nickname}</strong> さん
-                  {/* 名前変更ボタン */}
-                  <button onClick={startEditing} style={{marginLeft:"10px", fontSize:"0.8rem", padding:"2px 5px"}}>
+            <div>
+                <div style={{ marginBottom: "10px" }}>
+                  <span style={{ marginRight: "10px" }}>
+                    ようこそ、<strong>{nickname}</strong> さん
+                  </span>
+                  <button onClick={startEditing} style={{ fontSize:"0.8rem", padding:"2px 5px" }}>
                     名前変更
                   </button>
-                </p>
+                </div>
                 <button onClick={handleLogout} className="btn-logout">ログアウト</button>
               </div>
             )
