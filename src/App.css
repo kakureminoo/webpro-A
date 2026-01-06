@@ -337,3 +337,29 @@ button:active {
   font-family: 'Courier New', monospace;
   font-weight: bold;
 }
+/* src/App.css の一番下に追加 */
+
+.nickname-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  background-color: #333; /* 背景をわかりやすく */
+  border-radius: 5px;
+  border: 1px solid #555;
+}
+
+.nickname-form input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white; /* 入力欄を白く */
+  color: black;            /* 文字を黒く */
+  font-size: 16px;
+}
+
+.nickname-form p {
+  margin: 0;
+  color: white;
+  font-weight: bold;
+}
