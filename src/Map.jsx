@@ -278,12 +278,64 @@ export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
 
   }, [player, imagesLoaded, mapIndex, isTrapped, currentGrid]);
 
+  // ... (前略: tryMove関数やuseEffectなどはそのまま) ...
+
+  // ▼▼▼ 最後の return 部分をこれに書き換えてください ▼▼▼
+  // ▼▼▼ Map.js の return 部分をこれに書き換えてください ▼▼▼
   return (
-    <canvas
-      ref={canvasRef}
-      width={currentGrid[0].length * TILE}
-      height={currentGrid.length * TILE}
-      style={{ border: "2px solid #ccc", borderRadius: "4px" }}
-    />
+    <div style={{ textAlign: "center", paddingBottom: "20px" }}>
+      <canvas
+        ref={canvasRef}
+        width={currentGrid[0].length * TILE}
+        height={currentGrid.length * TILE}
+        style={{ 
+          border: "2px solid #ccc", 
+          borderRadius: "4px",
+          maxWidth: "100%",
+          height: "auto"
+        }}
+      />
+
+      {/* スマホ用コントローラー (全体を中央揃えにする設定を強化) */}
+      <div className="d-pad" style={{ 
+        marginTop: "20px", 
+        display: "flex",           // フレックスボックスを使う
+        flexDirection: "column",   // 縦並びにする
+        alignItems: "center"       // 左右の真ん中に揃える
+      }}>
+        
+        {/* 上ボタンの行 */}
+        <div style={{ marginBottom: "5px" }}>
+          <button style={btnStyle} onClick={() => tryMove(0, -1)}>▲</button>
+        </div>
+        
+        {/* 左・下・右ボタンの行 */}
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button style={btnStyle} onClick={() => tryMove(-1, 0)}>◀</button>
+          <button style={btnStyle} onClick={() => tryMove(0, 1)}>▼</button>
+          <button style={btnStyle} onClick={() => tryMove(1, 0)}>▶</button>
+        </div>
+
+      </div>
+    </div>
   );
 }
+
+// ▼▼▼ ボタンのデザイン（コードの最後やMap関数の外に置いてください） ▼▼▼
+const btnStyle = {
+  width: "60px",
+  height: "60px",
+  fontSize: "24px",
+  borderRadius: "50%", // 丸いボタン
+  border: "none",
+  backgroundColor: "#ddd",
+  boxShadow: "0 4px 0 #999", // 立体感
+  cursor: "pointer",
+  touchAction: "manipulation", // スマホでのタップ遅延を防ぐ重要設定
+  userSelect: "none", // 文字選択を防ぐ
+  margin: "0 5px", // ボタン同士の間隔
+  display: "flex",             // Flexboxレイアウトを使用
+  justifyContent: "center",    // 水平方向（横）の中央揃え
+  alignItems: "center",        // 垂直方向（縦）の中央揃え
+  padding: 0                   // 余計な隙間をリセット
+};

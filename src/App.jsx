@@ -7,6 +7,8 @@ import {
 } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import "./App.css";
+import ResetRanking from "./reset.jsx";
+
 
 // ▼ 効果音の読み込み (Trap音を追加)
 const audioExplore = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
@@ -16,6 +18,7 @@ const audioTrap    = new Audio("https://actions.google.com/sounds/v1/cartoon/car
 audioExplore.volume = 0.5;
 audioClear.volume = 0.5;
 audioTrap.volume = 0.5; // 追加
+
 
 const playSound = (audioObj) => {
   audioObj.currentTime = 0;
@@ -316,6 +319,10 @@ export default function App() {
           </ul>
         </div>
 
+        <div style={{ marginTop: "15px", borderTop: "1px dashed #ccc", paddingTop: "10px", textAlign: "right" }}>
+             <ResetRanking />
+        </div>
+        
         <div className="menu-buttons">
           {user && !isRegistering && !isEditing && (
             <button onClick={startGame} className="btn-primary">

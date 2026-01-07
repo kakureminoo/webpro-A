@@ -1,6 +1,8 @@
-// src/firebase.js
 import { initializeApp } from "firebase/app";
-// ▼ ここに signInAnonymously が必要です
+
+// ▼ ここで自分自身 (./firebase) をインポートしてはいけません。削除しました。
+
+// 必要な機能をFirebase SDKから直接インポートします
 import { 
   getAuth, 
   GoogleAuthProvider, 
@@ -8,6 +10,7 @@ import {
   signOut, 
   signInAnonymously 
 } from "firebase/auth";
+
 import { 
   getFirestore, 
   collection, 
@@ -18,8 +21,10 @@ import {
   getDocs, 
   doc, 
   getDoc, 
-  setDoc 
+  setDoc,
+  writeBatch // reset.jsxで使用するため追加しておくと便利です
 } from "firebase/firestore";
+
 const firebaseConfig = {
   apiKey: "AIzaSyAkmHUutBh7YcS3Fj6Aqf8P_BqeiU21n7U",
   authDomain: "rpg-exploration.firebaseapp.com",
@@ -30,18 +35,19 @@ const firebaseConfig = {
   measurementId: "G-067NQE1HMZ"
 };
 
+// 初期化
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-const db = getFirestore(app);
+const db = getFirestore(app); // ここでdbを定義します
 
-// ▼ ここで signInAnonymously を外に出す（エクスポート）必要があります
+// まとめてエクスポート
 export { 
   auth, 
   provider, 
   signInWithPopup, 
   signOut, 
-  signInAnonymously,  // ← これがないと画面が白くなります！
+  signInAnonymously, 
   db, 
   collection, 
   addDoc, 
@@ -51,5 +57,6 @@ export {
   getDocs, 
   doc, 
   getDoc, 
-  setDoc 
+  setDoc,
+  writeBatch // 追加
 };
