@@ -241,7 +241,7 @@ export default function App() {
   if (gamePhase === "start") {
     return (
       <div className="start-screen">
-        <h1 className="game-title">架空世界探索</h1>
+        <h1 className="game-title">世界探索</h1>
         
         <div className="login-box">
           {user ? (
@@ -322,7 +322,7 @@ export default function App() {
         <div style={{ marginTop: "15px", borderTop: "1px dashed #ccc", paddingTop: "10px", textAlign: "right" }}>
              <ResetRanking />
         </div>
-        
+
         <div className="menu-buttons">
           {user && !isRegistering && !isEditing && (
             <button onClick={startGame} className="btn-primary">
