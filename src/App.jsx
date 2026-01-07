@@ -15,6 +15,18 @@ const ALL_ITEMS = [
   ...ITEM_DATA.forest,
   ...ITEM_DATA.mountain
 ];
+// ▼ 【修正】音声をあらかじめ読み込んでおく（これで遅延がなくなります）
+const audioExplore = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
+const audioClear   = new Audio("https://actions.google.com/sounds/v1/cartoon/clank_car_crash.ogg");
+
+// 音量は控えめに
+audioExplore.volume = 0.5;
+audioClear.volume = 0.5;
+
+const playSound = (audioObj) => {
+  audioObj.currentTime = 0; // 連続打鍵できるように再生位置をリセット
+  audioObj.play().catch((e) => console.log("音声再生エラー:", e));
+};
 
 export default function App() {
   const [gamePhase, setGamePhase] = useState("start");
@@ -34,23 +46,45 @@ export default function App() {
   const [startTime, setStartTime] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
 
+  // ▼ 【追加】トースト通知のメッセージ管理
+  const [toastMessage, setToastMessage] = useState(null);
+
+  // ▼ 【追加】トーストを表示して、3秒後に消す関数
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    // 3秒後にメッセージを消す（nullにする）
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3000);
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        const userRef = doc(db, "users", currentUser.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-          setNickname(userSnap.data().name);
+        // ▼▼▼ 修正：ゲストかどうかで処理を分ける ▼▼▼
+        if (currentUser.isAnonymous) {
+          // ゲストなら名前は固定、登録画面はスキップ
+          setNickname("ゲスト");
+          setIsRegistering(false);
         } else {
-          setIsRegistering(true);
+          // Googleログインなら、以前の名前をDBから探す
+          const userRef = doc(db, "users", currentUser.uid);
+          const userSnap = await getDoc(userRef);
+
+          if (userSnap.exists()) {
+            setNickname(userSnap.data().name);
+          } else {
+            setIsRegistering(true);
+          }
         }
+        // ▲▲▲ 修正ここまで ▲▲▲
+        
         fetchRanking();
       } else {
         setNickname("");
         setIsRegistering(false);
-        setIsEditing(false); // ログアウト時は編集モードもオフ
+        setIsEditing(false);
       }
     });
     return () => unsubscribe();
@@ -140,12 +174,21 @@ export default function App() {
     const param = candidates[Math.floor(Math.random() * candidates.length)];
     let nextItems = collectedItems;
 
+    // ▼ 音声変数を直接渡す形に変更
+    playSound(audioExplore);
+
+    if (navigator.vibrate) {
+      navigator.vibrate(50);
+    }
+
     if (!collectedItems.includes(param)) {
       nextItems = [...collectedItems, param];
       setCollectedItems(nextItems);
-      alert(`「${param}」を見つけた！`);
+      // ▼ alert を削除し、showToast に変更
+      showToast(`✨ 「${param}」を見つけた！`);
     } else {
-      alert(`「${param}」を見つけた。（すでに登録済み）`);
+      // ▼ alert を削除し、showToast に変更
+      showToast(`「${param}」はすでに持っている...`);
     }
     setCanExplore(false);
 
@@ -153,12 +196,20 @@ export default function App() {
       finishGame();
     }
   }
+  
 
   async function finishGame() {
     setGamePhase("clear");
     const clearTime = Date.now() - startTime;
 
-    if (user) {
+    playSound(audioClear);
+    
+    if (navigator.vibrate) {
+      navigator.vibrate([200, 100, 200]); 
+    }
+
+    // ▼▼▼ 修正：ゲストでない(!user.isAnonymous)ときだけ保存 ▼▼▼
+    if (user && !user.isAnonymous) {
       try {
         await addDoc(collection(db, "scores"), {
           name: nickname,
@@ -166,10 +217,15 @@ export default function App() {
           date: new Date()
         });
         await fetchRanking();
+        showToast("ランキングに登録されました！");
       } catch (e) {
         console.error("Error adding document: ", e);
       }
+    } else {
+      // ゲストの場合
+      showToast("ゲストプレイのため記録は保存されません");
     }
+    // ▲▲▲ 修正ここまで ▲▲▲
   }
   
 
@@ -305,6 +361,11 @@ export default function App() {
           </div>
         ))}
       </div>
+    {toastMessage && (
+        <div className="toast-notification">
+          {toastMessage}
+        </div>
+      )}
     </div>
   );
 }

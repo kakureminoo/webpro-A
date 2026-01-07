@@ -363,3 +363,26 @@ button:active {
   color: white;
   font-weight: bold;
 }
+/* トースト通知のデザイン */
+.toast-notification {
+  position: fixed;
+  top: 30px;               /* ▼ bottom: 30px から変更 */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 16px;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  
+  /* ▼ アニメーション名変更 */
+  animation: fadeDown 0.3s ease-out;
+}
+
+/* ▼ 下からではなく、上から降りてくるアニメーションに変更 */
+@keyframes fadeDown {
+  from { opacity: 0; transform: translate(-50%, -20px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
