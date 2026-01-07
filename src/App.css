@@ -1,55 +1,58 @@
+/* App.css - ライトモード版 */
+
 /* === 全体のレイアウト === */
 :root {
   font-family: 'Helvetica Neue', Arial, sans-serif;
-  background-color: #242424; /* 背景色（ダークモード風） */
-  color: rgba(255, 255, 255, 0.87);
+  background-color: #ffffff; /* 白背景 */
+  color: #213547;            /* 濃い文字色 */
 }
 
 body {
   margin: 0;
   display: flex;
-  justify-content: center; /* 画面の左右中央 */
+  justify-content: center;
   min-height: 100vh;
 }
 
 #root {
   width: 100%;
-  max-width: 800px; /* コンテンツの最大幅 */
+  max-width: 800px;
   padding: 2rem;
-  text-align: center; /* テキストの中央揃え */
+  text-align: center;
   display: flex;
   flex-direction: column;
-  align-items: center; /* 子要素（キャンバスなど）を中央配置 */
+  align-items: center;
 }
 
 /* === スタート画面 === */
 .start-screen {
   display: flex;
-  flex-direction: column; /* 縦並び */
-  align-items: center;    /* 水平方向の中央揃え */
-  justify-content: center;/* 垂直方向の中央揃え */
-  height: 80vh;           /* 画面の高さを確保 */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
   width: 100%;
 }
 
 .game-title {
   font-size: 4em;
   margin-bottom: 60px;
-  color: #646cff;
-  text-shadow: 2px 2px 0px #fff;
+  color: #000000;
+  /* 影を薄いグレーに変更 */
+  text-shadow: 2px 2px 0px #ddd;
   line-height: 1.1;
 }
 
-/* ボタンを縦に並べるコンテナ */
+/* ボタンコンテナ */
 .menu-buttons {
   display: flex;
-  flex-direction: column; /* 縦並びにする重要な指定 */
-  gap: 20px;              /* ボタン間の隙間 */
+  flex-direction: column;
+  gap: 20px;
   width: 100%;
-  max-width: 300px;       /* ボタンの最大幅 */
+  max-width: 300px;
 }
 
-/* === ボタン共通デザイン === */
+/* === ボタン共通デザイン修正 === */
 button {
   cursor: pointer;
   padding: 12px 24px;
@@ -58,7 +61,7 @@ button {
   font-weight: bold;
   font-family: inherit;
   transition: transform 0.1s, background-color 0.2s;
-  width: 100%; /* 親コンテナいっぱいに広げる */
+  width: 100%;
 }
 
 button:active {
@@ -69,7 +72,8 @@ button:active {
 .btn-primary {
   font-size: 1.5em;
   background-color: #646cff;
-  color: white;
+  color: white; /* ここは白文字のまま */
+  border: none;
 }
 .btn-primary:hover {
   background-color: #535bf2;
@@ -78,12 +82,12 @@ button:active {
 /* 概要ボタン */
 .btn-secondary {
   font-size: 1.2em;
-  background-color: #1a1a1a;
-  color: #fff;
-  border: 1px solid #646cff;
+  background-color: #f0f0f0; /* 薄いグレー */
+  color: #333;               /* 濃い文字 */
+  border: 1px solid #ccc;
 }
 .btn-secondary:hover {
-  background-color: #333;
+  background-color: #e0e0e0;
 }
 
 /* 探索ボタン */
@@ -91,21 +95,12 @@ button:active {
   font-size: 1.2em;
   background-color: #ffcc00;
   color: #333;
-  width: auto; /* 探索ボタンだけは幅自動 */
+  width: auto;
   min-width: 200px;
+  border: none;
 }
 .btn-explore:hover {
   background-color: #ffd633;
-}
-
-/* === ゲーム画面のヘッダー === */
-.game-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  max-width: 560px; /* マップの幅に合わせる */
-  margin-bottom: 10px;
 }
 
 /* === モーダル（説明画面） === */
@@ -115,7 +110,7 @@ button:active {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.5); /* 背景を少し明るく */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,26 +118,26 @@ button:active {
 }
 
 .modal-content {
-  background: #333;
+  background: #ffffff; /* 白背景 */
   padding: 40px;
   border-radius: 12px;
   max-width: 400px;
   border: 2px solid #646cff;
-  color: white;
-  text-align: center; /* モーダル内も中央揃え */
+  color: #333; /* 濃い文字 */
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2); /* 影を追加 */
 }
 .modal-content h2 {
   margin-top: 0;
-  border-bottom: 1px solid #666;
+  border-bottom: 1px solid #ccc;
   padding-bottom: 15px;
   margin-bottom: 20px;
 }
-.modal-content p {
-  line-height: 1.8;
-  margin-bottom: 20px;
-}
 .modal-content button {
-  width: auto; /* 閉じるボタンは幅自動 */
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  color: #333;
+  width: auto;
   min-width: 120px;
   margin: 0 auto;
 }
@@ -152,8 +147,8 @@ button:active {
   border: 4px solid gold;
   padding: 20px;
   margin: 20px auto;
-  background-color: #ffffe0;
-  color: black;
+  background-color: #fff9c4; /* 薄い黄色 */
+  color: #333;
   border-radius: 8px;
   animation: pop 0.5s ease-out;
   max-width: 500px;
@@ -171,14 +166,14 @@ button:active {
   gap: 12px;
   justify-content: center;
   margin-top: 20px;
-  max-width: 600px; /* 横に広がりすぎないように */
+  max-width: 600px;
 }
 
 .item-card {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #555;
+  border: 1px solid #ccc;
   border-radius: 8px;
   width: 100px;
   height: 60px;
@@ -189,16 +184,15 @@ button:active {
 .item-card.found {
   background: #fff;
   color: #000;
-  border-color: #fff;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  border-color: #646cff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .item-card.unknown {
-  background: #333;
-  color: #666;
+  background: #e0e0e0; /* 薄いグレー */
+  color: #999;        /* 薄い文字 */
+  border-color: #ccc;
 }
-
-/* ...既存のCSSの下に追加してください... */
 
 /* === ログイン・入力エリア === */
 .login-box {
@@ -210,9 +204,9 @@ button:active {
   padding: 12px;
   font-size: 1.2rem;
   border-radius: 8px;
-  border: 2px solid #555;
-  background-color: #333;
-  color: white;
+  border: 2px solid #ccc;
+  background-color: #fff; /* 白背景 */
+  color: #333;            /* 濃い文字 */
   text-align: center;
   width: 250px;
   margin-bottom: 10px;
@@ -223,82 +217,77 @@ button:active {
   border-color: #646cff;
 }
 
-.best-time {
-  color: #ffcc00;
-  font-weight: bold;
-  font-size: 0.9rem;
-  margin: 0;
-}
-
-/* === ヘッダー情報（プレイヤー名・タイマー） === */
+/* === ヘッダー情報 === */
 .game-header {
-  /* 既存のスタイルに加えて調整 */
-  background-color: #1a1a1a;
+  background-color: #f9f9f9; /* 明るいグレー */
   padding: 10px 20px;
   border-radius: 8px;
   margin-bottom: 15px;
-  border: 1px solid #444;
+  border: 1px solid #ccc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 560px;
 }
 
 .player-info {
   font-size: 0.9rem;
-  color: #ccc;
+  color: #333;
 }
 
 .timer-display {
-  font-family: 'Courier New', monospace; /* 等幅フォントで数字のブレを防ぐ */
+  font-family: 'Courier New', monospace;
   font-size: 1.5rem;
   font-weight: bold;
-  color: #fff;
+  color: #333;
 }
 
 .time-value {
-  color: #ffcc00; /* 時間を目立たせる */
+  color: #e65100; /* オレンジ系で目立たせる */
 }
 
-/* === クリアタイム表示 === */
-.clear-time-result {
-  font-size: 2rem;
-  font-weight: bold;
-  font-family: 'Courier New', monospace;
-  margin: 10px 0;
-  color: #646cff;
-}
-/* ...既存のCSSの下に追加... */
-
+/* === ボタン追加分 === */
 .btn-google {
   background-color: #4285F4;
   color: white;
   font-weight: bold;
+  border: none;
 }
 .btn-google:hover {
   background-color: #357ae8;
 }
 
 .btn-logout {
-  background-color: #555;
-  color: #ccc;
+  background-color: #eee;
+  color: #555;
   font-size: 0.8em;
   padding: 5px 10px;
   margin-top: 5px;
   width: auto;
+  border: 1px solid #ccc;
+}
+.btn-logout:hover {
+  background-color: #ddd;
 }
 
+/* === ランキングボード === */
 .ranking-board {
-  background: #1a1a1a;
-  border: 1px solid #444;
+  background: #ffffff; /* 白背景 */
+  border: 1px solid #ccc;
   border-radius: 8px;
   padding: 15px;
   width: 100%;
   max-width: 400px;
   margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* 影を追加 */
 }
 
 .ranking-board h3 {
   margin-top: 0;
-  border-bottom: 1px solid #444;
+  border-bottom: 1px solid #eee;
   padding-bottom: 10px;
-  color: gold;
+  color: #d4af37; /* ゴールド（少し暗めに） */
 }
 
 .ranking-board ul {
@@ -311,18 +300,18 @@ button:active {
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #eee;
   font-size: 0.9rem;
+  color: #333;
 }
 
 .rank {
   font-weight: bold;
-  color: #aaa;
   width: 40px;
 }
-.ranking-board li:nth-child(1) .rank { color: gold; }
-.ranking-board li:nth-child(2) .rank { color: silver; }
-.ranking-board li:nth-child(3) .rank { color: #cd7f32; }
+.ranking-board li:nth-child(1) .rank { color: #d4af37; } /* Gold */
+.ranking-board li:nth-child(2) .rank { color: #a9a9a9; } /* Silver */
+.ranking-board li:nth-child(3) .rank { color: #cd7f32; } /* Bronze */
 
 .name {
   flex-grow: 1;
@@ -331,58 +320,89 @@ button:active {
   overflow: hidden;
   text-overflow: ellipsis;
   margin-right: 10px;
+  color: #333;
 }
 
 .time {
   font-family: 'Courier New', monospace;
   font-weight: bold;
+  color: #333;
 }
-/* src/App.css の一番下に追加 */
 
+/* === ニックネームフォーム === */
 .nickname-form {
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 10px;
-  background-color: #333; /* 背景をわかりやすく */
+  background-color: #f5f5f5; /* 背景を薄いグレーに */
   border-radius: 5px;
-  border: 1px solid #555;
+  border: 1px solid #ddd;
 }
 
 .nickname-form input {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  background-color: white; /* 入力欄を白く */
-  color: black;            /* 文字を黒く */
+  background-color: white;
+  color: black;
   font-size: 16px;
 }
 
 .nickname-form p {
   margin: 0;
-  color: white;
+  color: #333;
   font-weight: bold;
 }
-/* トースト通知のデザイン */
+
+/* トースト通知 */
 .toast-notification {
   position: fixed;
-  top: 30px;               /* ▼ bottom: 30px から変更 */
+  top: 30px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: #333; /* トーストは黒背景のままにして目立たせる */
   color: white;
   padding: 12px 24px;
   border-radius: 25px;
   font-size: 16px;
   z-index: 1000;
   box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-  
-  /* ▼ アニメーション名変更 */
   animation: fadeDown 0.3s ease-out;
 }
 
-/* ▼ 下からではなく、上から降りてくるアニメーションに変更 */
 @keyframes fadeDown {
   from { opacity: 0; transform: translate(-50%, -20px); }
   to   { opacity: 1; transform: translate(-50%, 0); }
+}
+/* === トラップ演出 === */
+
+/* 画面を激しく揺らす */
+.shake-screen {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-2px, 0, 0); }
+  20%, 80% { transform: translate3d(4px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+  40%, 60% { transform: translate3d(6px, 0, 0); }
+}
+
+/* 画面を一瞬赤くするオーバーレイ */
+.trap-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 0, 0, 0.3); /* 半透明の赤 */
+  z-index: 9999;
+  pointer-events: none; /* クリックを邪魔しないようにする */
+  animation: fadeOut 0.5s forwards;
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
