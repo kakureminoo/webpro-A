@@ -1,10 +1,25 @@
 // src/firebase.js
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-// ▼ doc, getDoc, setDoc を追加しました
-import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
-
-// ▼【重要】ここはあなたの設定のままにしてください！
+// ▼ ここに signInAnonymously が必要です
+import { 
+  getAuth, 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  signOut, 
+  signInAnonymously 
+} from "firebase/auth";
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  query, 
+  orderBy, 
+  limit, 
+  getDocs, 
+  doc, 
+  getDoc, 
+  setDoc 
+} from "firebase/firestore";
 const firebaseConfig = {
   apiKey: "AIzaSyAkmHUutBh7YcS3Fj6Aqf8P_BqeiU21n7U",
   authDomain: "rpg-exploration.firebaseapp.com",
@@ -17,8 +32,24 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
+const db = getFirestore(app);
 
-// ▼ doc, getDoc, setDoc をexportに追加しました
-export { auth, db, provider, signInWithPopup, signOut, collection, addDoc, query, orderBy, limit, getDocs, doc, getDoc, setDoc };
+// ▼ ここで signInAnonymously を外に出す（エクスポート）必要があります
+export { 
+  auth, 
+  provider, 
+  signInWithPopup, 
+  signOut, 
+  signInAnonymously,  // ← これがないと画面が白くなります！
+  db, 
+  collection, 
+  addDoc, 
+  query, 
+  orderBy, 
+  limit, 
+  getDocs, 
+  doc, 
+  getDoc, 
+  setDoc 
+};
