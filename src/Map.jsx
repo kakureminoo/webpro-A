@@ -14,20 +14,19 @@ playerImg.src = playerImgSrc;
 
 const TILE = 40;
 
-// ▼ マップデータを3つに増やしました
 const MAPS = [
   {
     id: "field",
     data: [
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,1],
-      [1,0,2,0,1,1,0,1,0,2,0,1,0,1], // 2が探索ポイント
-      [1,0,0,0,0,0,0,1,0,0,0,1,0,1],
+      [1,0,2,0,1,1,0,1,0,2,0,1,0,1],
+      [1,0,3,0,0,0,0,1,0,0,0,1,0,1],
       [1,1,0,1,1,0,1,1,0,1,0,1,0,1],
       [1,0,0,0,1,0,0,0,0,1,0,0,0,1],
       [1,0,1,0,0,0,1,0,0,0,0,1,0,0],
       [1,0,0,0,1,0,0,0,1,0,2,0,0,1],
-      [1,0,0,1,1,0,0,0,0,0,0,0,0,1],
+      [1,0,0,1,1,0,3,0,0,0,0,0,0,1],
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     ],
   },
@@ -35,27 +34,27 @@ const MAPS = [
     id: "forest",
     data: [
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-      [1,0,2,2,0,0,0,0,0,0,0,0,0,1],
+      [1,0,2,2,0,0,0,0,3,0,0,0,0,1],
       [1,0,2,2,1,1,0,1,0,0,0,1,0,1],
       [1,0,0,0,0,0,0,1,0,0,0,1,0,1],
       [1,1,0,1,1,0,1,1,0,1,0,1,0,1],
       [1,0,0,0,1,0,0,0,0,1,0,0,0,1],
-      [0,0,1,0,0,0,1,0,0,0,0,1,0,0], // 左端が道(0)で前マップへ
+      [0,0,1,0,0,0,1,0,0,0,0,1,0,0],
       [1,0,0,0,1,0,0,0,1,0,0,0,0,1],
       [1,0,0,1,1,0,0,0,0,0,0,0,0,1],
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     ],
   },
   {
-    id: "mountain", // 新しいマップ
+    id: "mountain",
     data: [
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
       [1,0,0,0,1,0,0,0,0,0,0,2,0,1],
       [1,0,1,0,1,0,1,1,1,1,1,1,0,1],
       [1,0,1,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,1,1,1,1,0,1,1,1,1,1,0,1],
-      [1,0,0,0,0,2,0,1,2,0,0,0,0,1],
-      [0,0,1,1,1,1,1,1,1,1,1,1,0,1], // 入口
+      [1,0,0,3,0,2,0,1,2,0,3,0,0,1],
+      [0,0,1,1,1,1,1,1,1,1,1,1,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,1],
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -63,16 +62,15 @@ const MAPS = [
   },
 ];
 
-export default function Map({ onReach, onMapChange }) {
+export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
   const canvasRef = useRef(null);
-
   const [mapIndex, setMapIndex] = useState(0);
   const [player, setPlayer] = useState({ x: 1, y: 1 });
   const [imagesLoaded, setImagesLoaded] = useState(false);
 
   const MAP = MAPS[mapIndex].data;
 
-  // 画像読み込み処理
+  // ▼▼▼ ここが消えていたため復元しました（画像ロード処理） ▼▼▼
   useEffect(() => {
     let loadedCount = 0;
     const images = [grassedgeImg, grassloadImg, playerImg];
@@ -87,28 +85,28 @@ export default function Map({ onReach, onMapChange }) {
     });
   }, []);
 
-  // マップ変更時に親へ通知
+  // ▼▼▼ ここが消えていたため復元しました（マップ変更通知） ▼▼▼
   useEffect(() => {
     if (onMapChange) {
       onMapChange(MAPS[mapIndex].id);
     }
   }, [mapIndex, onMapChange]);
 
-  // 移動・探索判定ロジック
+
   function tryMove(dx, dy) {
+    // スタン中なら動かない
+    if (isTrapped) return;
+
     const nx = player.x + dx;
     const ny = player.y + dy;
 
-    // 前のマップへ (左移動)
+    // マップ移動ロジック
     if (nx < 0 && mapIndex > 0) {
       setMapIndex(mapIndex - 1);
       setPlayer({ x: MAPS[mapIndex - 1].data[0].length - 2, y: player.y });
-      // マップ移動直後はボタンを消す
       onReach(false); 
       return;
     }
-
-    // 次のマップへ (右移動)
     if (nx >= MAP[0].length && mapIndex < MAPS.length - 1) {
       setMapIndex(mapIndex + 1);
       setPlayer({ x: 1, y: player.y });
@@ -120,20 +118,27 @@ export default function Map({ onReach, onMapChange }) {
     if (MAP[ny] && MAP[ny][nx] !== 1) {
       setPlayer({ x: nx, y: ny });
       
-      // 探索ポイント(2)に乗ったらボタン表示
-      if (MAP[ny][nx] === 2) {
+      const tileType = MAP[ny][nx];
+
+      // 探索ポイント
+      if (tileType === 2) {
         onReach(true);
       } else {
         onReach(false);
       }
+
+      // 落とし穴
+      if (tileType === 3) {
+        if (onTrap) onTrap();
+      }
     }
   }
 
-  // キー入力
- // キー入力
+  // キー操作
   useEffect(() => {
     const handleKey = (e) => {
-      // 矢印キー または WASDキー で移動
+      if (isTrapped) return; // スタン中は無効
+
       if (e.key === "ArrowUp"    || e.key === "w") tryMove(0, -1);
       if (e.key === "ArrowDown"  || e.key === "s") tryMove(0, 1);
       if (e.key === "ArrowLeft"  || e.key === "a") tryMove(-1, 0);
@@ -141,9 +146,9 @@ export default function Map({ onReach, onMapChange }) {
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [player, mapIndex]);
+  }, [player, mapIndex, isTrapped]);
 
-  // 描画
+  // 描画処理
   useEffect(() => {
     if (!imagesLoaded) return;
     const canvas = canvasRef.current;
@@ -159,25 +164,37 @@ export default function Map({ onReach, onMapChange }) {
         else img = grassloadImg;
         ctx.drawImage(img, x * TILE, y * TILE, TILE, TILE);
         
-        // デバッグ用: 探索ポイントを少し目立たせる（薄い黄色）
-        // 画像があるなら画像切り替えが良いですが、今回は簡易的に枠線で
+        // 探索ポイント(2)
         if (tile === 2) {
             ctx.strokeStyle = "yellow";
             ctx.lineWidth = 2;
             ctx.strokeRect(x * TILE + 5, y * TILE + 5, TILE - 10, TILE - 10);
         }
+
+        // 落とし穴(3)
+        if (tile === 3) {
+          // プレイヤーがこの罠の上にいて、かつスタン中(isTrapped)なら「赤」にする
+          const isStepping = (x === player.x && y === player.y && isTrapped);
+          
+          ctx.fillStyle = isStepping ? "rgba(255, 0, 0, 0.8)" : "rgba(0, 0, 0, 0.4)";
+          
+          ctx.beginPath();
+          const size = isStepping ? TILE/2.5 : TILE/4;
+          ctx.arc(x * TILE + TILE/2, y * TILE + TILE/2, size, 0, Math.PI * 2);
+          ctx.fill();
+        }
       });
     });
 
     ctx.drawImage(playerImg, player.x * TILE, player.y * TILE, TILE, TILE);
-  }, [player, imagesLoaded, mapIndex]);
+  }, [player, imagesLoaded, mapIndex, isTrapped]);
 
   return (
     <canvas
       ref={canvasRef}
       width={MAP[0].length * TILE}
       height={MAP.length * TILE}
-      style={{ border: "2px solid #333", borderRadius: "4px" }}
+      style={{ border: "2px solid #ccc", borderRadius: "4px" }}
     />
   );
 }

@@ -8,13 +8,15 @@ import {
 import { onAuthStateChanged } from "firebase/auth";
 import "./App.css";
 
-// 効果音の読み込み
+// ▼ 効果音の読み込み (Trap音を追加)
 const audioExplore = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
 const audioClear   = new Audio("https://actions.google.com/sounds/v1/cartoon/clank_car_crash.ogg");
+const audioTrap    = new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg"); // 追加
+
 audioExplore.volume = 0.5;
 audioClear.volume = 0.5;
+audioTrap.volume = 0.5; // 追加
 
-// 音声再生関数
 const playSound = (audioObj) => {
   audioObj.currentTime = 0;
   audioObj.play().catch((e) => console.log("音声再生エラー:", e));
@@ -49,10 +51,9 @@ export default function App() {
   const [startTime, setStartTime] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
 
-  // トースト通知用の状態
+  const [isTrapped, setIsTrapped] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
-  // トーストを表示する関数
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => {
@@ -64,12 +65,10 @@ export default function App() {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        // ゲストログイン判定
         if (currentUser.isAnonymous) {
           setNickname("ゲスト");
           setIsRegistering(false);
         } else {
-          // Googleログインの場合はDBを確認
           const userRef = doc(db, "users", currentUser.uid);
           const userSnap = await getDoc(userRef);
 
@@ -180,7 +179,6 @@ export default function App() {
     const param = candidates[Math.floor(Math.random() * candidates.length)];
     let nextItems = collectedItems;
 
-    // 音を鳴らす（振動は削除しました）
     playSound(audioExplore);
 
     if (!collectedItems.includes(param)) {
@@ -197,14 +195,29 @@ export default function App() {
     }
   }
 
+  // ▼ 落とし穴イベント用の関数
+  function handleTrap() {
+    // すでに罠にかかっている最中なら何もしない（連打防止）
+    if (isTrapped) return;
+
+    // 1. 効果音
+    playSound(audioTrap);
+    
+    // 2. スタン開始 & 演出ON
+    setIsTrapped(true); 
+    showToast("💦 落とし穴！しばらく動けない！");
+
+    // 3. 0.5秒後にスタン解除
+    setTimeout(() => {
+      setIsTrapped(false);
+    }, 500);
+  }
+
   async function finishGame() {
     setGamePhase("clear");
     const clearTime = Date.now() - startTime;
-
-    // クリア音（振動は削除しました）
     playSound(audioClear);
 
-    // ゲストでない場合のみ保存
     if (user && !user.isAnonymous) {
       try {
         await addDoc(collection(db, "scores"), {
@@ -333,7 +346,11 @@ export default function App() {
 
   return (
     <div>
+      {/* 罠にかかった時だけ赤いオーバーレイを表示 */}
+      {isTrapped && <div className="trap-overlay" />}
+
       <div className="game-header">
+        {/* ...ヘッダーの中身はそのまま... */}
         <div className="player-info">
           {user?.photoURL && <img src={user.photoURL} alt="icon" style={{width:24, borderRadius:'50%', verticalAlign:'middle', marginRight:5}}/>}
           <span>{nickname}</span>
@@ -347,7 +364,8 @@ export default function App() {
       </div>
 
       {gamePhase === "clear" && (
-        <div className="clear-message">
+         /* ...クリア画面そのまま... */
+         <div className="clear-message">
           <h2>🎉 CONGRATULATIONS! 🎉</h2>
           <p>記録: {formatTime(currentTime)}</p>
           {!user?.isAnonymous && <p>ランキングに登録されました！</p>}
@@ -357,10 +375,21 @@ export default function App() {
         </div>
       )}
 
-      <Map onReach={setCanExplore} onMapChange={setCurrentMapId} />
+      {/* ▼ 画面揺れ演出のクラス (.shake-screen) を条件付きで付与 
+        ▼ Mapコンポーネントに isTrapped を渡す
+      */}
+      <div className={isTrapped ? "shake-screen" : ""}>
+        <Map 
+          onReach={setCanExplore} 
+          onMapChange={setCurrentMapId} 
+          onTrap={handleTrap}
+          isTrapped={isTrapped} // これを追加！
+        />
+      </div>
 
+      {/* ...以下、ボタンや図鑑などはそのまま... */}
       <div style={{ height: "60px", margin: "10px" }}>
-        {gamePhase === "playing" && canExplore && (
+        {gamePhase === "playing" && canExplore && !isTrapped && (
           <button onClick={explore} className="btn-explore">
              🔍 探索する
           </button>
