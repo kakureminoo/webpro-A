@@ -1,8 +1,24 @@
 import { useState, useEffect } from "react";
 import Map from "./Map";
-// firebase.js から必要な機能を読み込み
-import { auth, provider, signInWithPopup, signOut, db, collection, addDoc, query, orderBy, limit, getDocs, doc, getDoc, setDoc } from "./firebase";
+import { 
+  auth, provider, signInWithPopup, signOut, signInAnonymously,
+  db, collection, addDoc, query, orderBy, limit, getDocs, 
+  doc, getDoc, setDoc 
+} from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import "./App.css";
+
+// 効果音の読み込み
+const audioExplore = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
+const audioClear   = new Audio("https://actions.google.com/sounds/v1/cartoon/clank_car_crash.ogg");
+audioExplore.volume = 0.5;
+audioClear.volume = 0.5;
+
+// 音声再生関数
+const playSound = (audioObj) => {
+  audioObj.currentTime = 0;
+  audioObj.play().catch((e) => console.log("音声再生エラー:", e));
+};
 
 const ITEM_DATA = {
   field:  ["薬草", "石ころ", "謎の種"],
@@ -15,18 +31,6 @@ const ALL_ITEMS = [
   ...ITEM_DATA.forest,
   ...ITEM_DATA.mountain
 ];
-// ▼ 【修正】音声をあらかじめ読み込んでおく（これで遅延がなくなります）
-const audioExplore = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
-const audioClear   = new Audio("https://actions.google.com/sounds/v1/cartoon/clank_car_crash.ogg");
-
-// 音量は控えめに
-audioExplore.volume = 0.5;
-audioClear.volume = 0.5;
-
-const playSound = (audioObj) => {
-  audioObj.currentTime = 0; // 連続打鍵できるように再生位置をリセット
-  audioObj.play().catch((e) => console.log("音声再生エラー:", e));
-};
 
 export default function App() {
   const [gamePhase, setGamePhase] = useState("start");
@@ -36,7 +40,6 @@ export default function App() {
   const [nickname, setNickname] = useState("");
   const [inputName, setInputName] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
-  // ▼【追加】編集モードかどうかを管理するスイッチ
   const [isEditing, setIsEditing] = useState(false);
 
   const [ranking, setRanking] = useState([]);
@@ -46,13 +49,12 @@ export default function App() {
   const [startTime, setStartTime] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
 
-  // ▼ 【追加】トースト通知のメッセージ管理
+  // トースト通知用の状態
   const [toastMessage, setToastMessage] = useState(null);
 
-  // ▼ 【追加】トーストを表示して、3秒後に消す関数
+  // トーストを表示する関数
   const showToast = (msg) => {
     setToastMessage(msg);
-    // 3秒後にメッセージを消す（nullにする）
     setTimeout(() => {
       setToastMessage(null);
     }, 3000);
@@ -62,13 +64,12 @@ export default function App() {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        // ▼▼▼ 修正：ゲストかどうかで処理を分ける ▼▼▼
+        // ゲストログイン判定
         if (currentUser.isAnonymous) {
-          // ゲストなら名前は固定、登録画面はスキップ
           setNickname("ゲスト");
           setIsRegistering(false);
         } else {
-          // Googleログインなら、以前の名前をDBから探す
+          // Googleログインの場合はDBを確認
           const userRef = doc(db, "users", currentUser.uid);
           const userSnap = await getDoc(userRef);
 
@@ -78,8 +79,6 @@ export default function App() {
             setIsRegistering(true);
           }
         }
-        // ▲▲▲ 修正ここまで ▲▲▲
-        
         fetchRanking();
       } else {
         setNickname("");
@@ -90,10 +89,9 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // 名前を保存・更新する関数
   const handleRegisterName = async () => {
-    if (!inputName.trim()) return alert("名前を入力してください");
-    if (inputName.length > 10) return alert("名前は10文字以内でお願いします");
+    if (!inputName.trim()) return showToast("名前を入力してください");
+    if (inputName.length > 10) return showToast("名前は10文字以内でお願いします");
 
     try {
       await setDoc(doc(db, "users", user.uid), {
@@ -101,16 +99,16 @@ export default function App() {
       });
       setNickname(inputName);
       setIsRegistering(false);
-      setIsEditing(false); // 編集モード終了
+      setIsEditing(false);
+      showToast("名前を保存しました！");
     } catch (error) {
       console.error("Error saving nickname:", error);
     }
   };
 
-  // ▼【追加】「変更」ボタンを押したときの処理
   const startEditing = () => {
-    setInputName(nickname); // 今の名前を入力欄に入れておく
-    setIsEditing(true);     // 編集モードON
+    setInputName(nickname);
+    setIsEditing(true);
   };
 
   const handleLogin = async () => {
@@ -118,6 +116,14 @@ export default function App() {
       await signInWithPopup(auth, provider);
     } catch (error) {
       console.error("Login failed", error);
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    try {
+      await signInAnonymously(auth);
+    } catch (error) {
+      console.error("Guest login failed", error);
     }
   };
 
@@ -154,11 +160,11 @@ export default function App() {
 
   function startGame() {
     if (!user) {
-      alert("ログインしてください！");
+      showToast("ログインしてください！");
       return;
     }
     if (isRegistering || isEditing) {
-      alert("ニックネームを決めてください！");
+      showToast("ニックネームを決めてください！");
       return;
     }
     setCollectedItems([]);
@@ -174,20 +180,14 @@ export default function App() {
     const param = candidates[Math.floor(Math.random() * candidates.length)];
     let nextItems = collectedItems;
 
-    // ▼ 音声変数を直接渡す形に変更
+    // 音を鳴らす（振動は削除しました）
     playSound(audioExplore);
-
-    if (navigator.vibrate) {
-      navigator.vibrate(50);
-    }
 
     if (!collectedItems.includes(param)) {
       nextItems = [...collectedItems, param];
       setCollectedItems(nextItems);
-      // ▼ alert を削除し、showToast に変更
       showToast(`✨ 「${param}」を見つけた！`);
     } else {
-      // ▼ alert を削除し、showToast に変更
       showToast(`「${param}」はすでに持っている...`);
     }
     setCanExplore(false);
@@ -196,19 +196,15 @@ export default function App() {
       finishGame();
     }
   }
-  
 
   async function finishGame() {
     setGamePhase("clear");
     const clearTime = Date.now() - startTime;
 
+    // クリア音（振動は削除しました）
     playSound(audioClear);
-    
-    if (navigator.vibrate) {
-      navigator.vibrate([200, 100, 200]); 
-    }
 
-    // ▼▼▼ 修正：ゲストでない(!user.isAnonymous)ときだけ保存 ▼▼▼
+    // ゲストでない場合のみ保存
     if (user && !user.isAnonymous) {
       try {
         await addDoc(collection(db, "scores"), {
@@ -222,12 +218,9 @@ export default function App() {
         console.error("Error adding document: ", e);
       }
     } else {
-      // ゲストの場合
       showToast("ゲストプレイのため記録は保存されません");
     }
-    // ▲▲▲ 修正ここまで ▲▲▲
   }
-  
 
   if (gamePhase === "start") {
     return (
@@ -236,7 +229,6 @@ export default function App() {
         
         <div className="login-box">
           {user ? (
-            // ▼ ここから：編集モードか通常モードかで表示を切り替え
             (isRegistering || isEditing) ? (
               <div className="nickname-form">
                 <p>{isEditing ? "新しいニックネーム" : "ニックネームを決めてください"}</p>
@@ -250,7 +242,6 @@ export default function App() {
                 <button onClick={handleRegisterName} className="btn-primary" style={{marginLeft:"5px"}}>
                   保存
                 </button>
-                {/* 編集モードの時だけキャンセルボタンを表示 */}
                 {isEditing && (
                   <button onClick={() => setIsEditing(false)} style={{marginLeft:"5px", fontSize:"0.8rem"}}>
                     キャンセル
@@ -258,23 +249,43 @@ export default function App() {
                 )}
               </div>
             ) : (
-            <div>
+              <div>
                 <div style={{ marginBottom: "10px" }}>
                   <span style={{ marginRight: "10px" }}>
                     ようこそ、<strong>{nickname}</strong> さん
                   </span>
-                  <button onClick={startEditing} style={{ fontSize:"0.8rem", padding:"2px 5px" }}>
-                    名前変更
-                  </button>
+                  {!user.isAnonymous && (
+                    <button onClick={startEditing} style={{ fontSize:"0.8rem", padding:"2px 5px" }}>
+                      名前変更
+                    </button>
+                  )}
                 </div>
                 <button onClick={handleLogout} className="btn-logout">ログアウト</button>
               </div>
             )
-            // ▲ ここまで変更しました
           ) : (
-            <button onClick={handleLogin} className="btn-google">
-              G Googleでログインして参加
-            </button>
+            <div style={{ display: "flex", flexDirection: "column", gap: "15px", alignItems: "center" }}>
+              <button onClick={handleLogin} className="btn-google">
+                G Googleでログインして参加
+              </button>
+              
+              <p style={{ margin: 0, fontSize: "0.8rem", color: "#666" }}>または</p>
+
+              <button 
+                onClick={handleGuestLogin} 
+                style={{ 
+                  padding: "8px 16px", 
+                  fontSize: "0.9rem", 
+                  cursor: "pointer",
+                  backgroundColor: "#f0f0f0",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  color: "#333"
+                }}
+              >
+                👤 ゲストとしてプレイ
+              </button>
+            </div>
           )}
         </div>
 
@@ -309,10 +320,13 @@ export default function App() {
               <h2>遊び方</h2>
               <p>ログインしてタイムアタックに挑戦！</p>
               <p>クリアタイムは世界ランキングに登録されます。</p>
+              <p>※ゲストプレイ時は記録されません</p>
               <button onClick={() => setShowDescription(false)}>閉じる</button>
             </div>
           </div>
         )}
+        
+        {toastMessage && <div className="toast-notification">{toastMessage}</div>}
       </div>
     );
   }
@@ -336,7 +350,7 @@ export default function App() {
         <div className="clear-message">
           <h2>🎉 CONGRATULATIONS! 🎉</h2>
           <p>記録: {formatTime(currentTime)}</p>
-          <p>ランキングに登録されました！</p>
+          {!user?.isAnonymous && <p>ランキングに登録されました！</p>}
           <button onClick={() => setGamePhase("start")} style={{marginTop: "10px"}}>
             ランキングを見る
           </button>
@@ -361,11 +375,8 @@ export default function App() {
           </div>
         ))}
       </div>
-    {toastMessage && (
-        <div className="toast-notification">
-          {toastMessage}
-        </div>
-      )}
+
+      {toastMessage && <div className="toast-notification">{toastMessage}</div>}
     </div>
   );
 }
