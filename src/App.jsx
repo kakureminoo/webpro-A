@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
+import "./App.css";
 import Map from "./Map";
+import ResetRanking from "./reset.jsx";
 import { 
   auth, provider, signInWithPopup, signOut, signInAnonymously,
   db, collection, addDoc, query, orderBy, limit, getDocs, 
   doc, getDoc, setDoc 
 } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import "./App.css";
-import ResetRanking from "./reset.jsx";
 
-// SE
 const audioExplore = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
 const audioClear   = new Audio("https://actions.google.com/sounds/v1/cartoon/clank_car_crash.ogg");
 const audioTrap    = new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg");
@@ -35,16 +34,22 @@ const ALL_ITEMS = [
   ...ITEM_DATA.mountain
 ];
 
+// メインコンポーネント
 export default function App() {
+  //State
+
+  // ゲーム進行管理
   const [gamePhase, setGamePhase] = useState("start");
   const [showDescription, setShowDescription] = useState(false);
-  const [user, setUser] = useState(null);
   
+  // ユーザー・認証管理
+  const [user, setUser] = useState(null);
   const [nickname, setNickname] = useState("");
   const [inputName, setInputName] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
+  // ゲームプレイデータ
   const [ranking, setRanking] = useState([]);
   const [collectedItems, setCollectedItems] = useState([]);
   const [canExplore, setCanExplore] = useState(false);
@@ -52,16 +57,13 @@ export default function App() {
   const [startTime, setStartTime] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
 
+  // 演出
   const [isTrapped, setIsTrapped] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 3000);
-  };
+  // useEffect
 
+  // 認証状態
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
@@ -89,26 +91,41 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  const handleRegisterName = async () => {
-    if (!inputName.trim()) return showToast("名前を入力してください");
-    if (inputName.length > 10) return showToast("名前は10文字以内でお願いします");
-
-    try {
-      await setDoc(doc(db, "users", user.uid), {
-        name: inputName
-      });
-      setNickname(inputName);
-      setIsRegistering(false);
-      setIsEditing(false);
-      showToast("名前を保存しました！");
-    } catch (error) {
-      console.error("Error saving nickname:", error);
+  // タイマー
+  useEffect(() => {
+    let interval;
+    if (gamePhase === "playing") {
+      interval = setInterval(() => {
+        setCurrentTime(Date.now() - startTime);
+      }, 50);
     }
+    return () => clearInterval(interval);
+  }, [gamePhase, startTime]);
+
+  // ヘルパー関数 (便利ツール)
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3000);
   };
 
-  const startEditing = () => {
-    setInputName(nickname);
-    setIsEditing(true);
+  const formatTime = (ms) => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const centis = Math.floor((ms % 1000) / 10);
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(centis).padStart(2, '0')}`;
+  };
+
+  // データ・認証関連の関数
+
+  const fetchRanking = async () => {
+    const q = query(collection(db, "scores"), orderBy("time", "asc"), limit(10));
+    const querySnapshot = await getDocs(q);
+    const data = querySnapshot.docs.map(doc => doc.data());
+    setRanking(data);
   };
 
   const handleLogin = async () => {
@@ -133,30 +150,29 @@ export default function App() {
     setNickname("");
   };
 
-  const fetchRanking = async () => {
-    const q = query(collection(db, "scores"), orderBy("time", "asc"), limit(10));
-    const querySnapshot = await getDocs(q);
-    const data = querySnapshot.docs.map(doc => doc.data());
-    setRanking(data);
-  };
+  const handleRegisterName = async () => {
+    if (!inputName.trim()) return showToast("名前を入力してください");
+    if (inputName.length > 10) return showToast("名前は10文字以内でお願いします");
 
-  useEffect(() => {
-    let interval;
-    if (gamePhase === "playing") {
-      interval = setInterval(() => {
-        setCurrentTime(Date.now() - startTime);
-      }, 50);
+    try {
+      await setDoc(doc(db, "users", user.uid), {
+        name: inputName
+      });
+      setNickname(inputName);
+      setIsRegistering(false);
+      setIsEditing(false);
+      showToast("名前を保存しました！");
+    } catch (error) {
+      console.error("Error saving nickname:", error);
     }
-    return () => clearInterval(interval);
-  }, [gamePhase, startTime]);
-
-  const formatTime = (ms) => {
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    const centis = Math.floor((ms % 1000) / 10);
-    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(centis).padStart(2, '0')}`;
   };
+
+  const startEditing = () => {
+    setInputName(nickname);
+    setIsEditing(true);
+  };
+
+  // ゲームロジック
 
   function startGame() {
     if (!user) {
@@ -196,15 +212,11 @@ export default function App() {
     }
   }
 
-  // 罠
   function handleTrap() {
     if (isTrapped) return;
-
     playSound(audioTrap);
-    
     setIsTrapped(true); 
     showToast("落とし穴！しばらく動けない！");
-
     setTimeout(() => {
       setIsTrapped(false);
     }, 500);
@@ -232,11 +244,14 @@ export default function App() {
     }
   }
 
+  // 画面描画
+  // スタート画面
   if (gamePhase === "start") {
     return (
       <div className="start-screen">
         <h1 className="game-title">世界探索</h1>
         
+        {/* ログイン */}
         <div className="login-box">
           {user ? (
             (isRegistering || isEditing) ? (
@@ -278,9 +293,7 @@ export default function App() {
               <button onClick={handleLogin} className="btn-google">
                 G Googleでログインして参加
               </button>
-              
               <p style={{ margin: 0, fontSize: "0.8rem", color: "#666" }}>または</p>
-
               <button 
                 onClick={handleGuestLogin} 
                 style={{ 
@@ -299,6 +312,7 @@ export default function App() {
           )}
         </div>
 
+        {/* ランキング */}
         <div className="ranking-board">
           <h3>🏆 世界ランキング (TOP 10)</h3>
           <ul>
@@ -313,10 +327,12 @@ export default function App() {
           </ul>
         </div>
 
+        {/* リセットボタン */}
         <div style={{ marginTop: "15px", borderTop: "1px dashed #ccc", paddingTop: "10px", textAlign: "right" }}>
              <ResetRanking />
         </div>
 
+        {/* メニューボタン */}
         <div className="menu-buttons">
           {user && !isRegistering && !isEditing && (
             <button onClick={startGame} className="btn-primary">
@@ -328,6 +344,7 @@ export default function App() {
           </button>
         </div>
 
+        {/* 説明モーダル */}
         {showDescription && (
           <div className="modal-overlay">
             <div className="modal-content">
@@ -345,6 +362,7 @@ export default function App() {
     );
   }
 
+  // ゲームプレイ画面
   return (
     <div>
       {isTrapped && <div className="trap-overlay" />}

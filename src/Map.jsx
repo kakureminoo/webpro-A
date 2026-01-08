@@ -5,14 +5,14 @@ import playerImgSrc from "./assets/player.png";
 import rockloadImgSrc from "./assets/rockload.png";
 import rockedgeImgSrc from "./assets/rockedge.png";
 
+const TILE = 40;
+const TILE_OPEN_HOLE = 4;
+
 const grassedgeImg = new Image(); grassedgeImg.src = grassedgeImgSrc;
 const grassloadImg = new Image(); grassloadImg.src = grassloadImgSrc;
 const rockedgeImg = new Image();  rockedgeImg.src = rockedgeImgSrc;
 const rockloadImg = new Image();  rockloadImg.src = rockloadImgSrc;
-const playerImg = new Image(); playerImg.src = playerImgSrc;
-
-const TILE = 40;
-const TILE_OPEN_HOLE = 4;
+const playerImg = new Image();    playerImg.src = playerImgSrc;
 
 const MAPS = [
   {
@@ -63,11 +63,15 @@ const MAPS = [
 ];
 
 export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
+  // State
+
   const canvasRef = useRef(null);
   const [mapIndex, setMapIndex] = useState(0);
   const [player, setPlayer] = useState({ x: 1, y: 1, dir: "down" });
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const [currentGrid, setCurrentGrid] = useState(JSON.parse(JSON.stringify(MAPS[0].data)));
+
+  // 初期化
 
   useEffect(() => {
     let loadedCount = 0;
@@ -83,13 +87,14 @@ export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
     });
   }, []);
 
-  // Map sync
   useEffect(() => {
     setCurrentGrid(JSON.parse(JSON.stringify(MAPS[mapIndex].data)));
     if (onMapChange) {
       onMapChange(MAPS[mapIndex].id);
     }
   }, [mapIndex, onMapChange]);
+
+  // ゲームロジック
 
   function tryMove(dx, dy) {
     if (isTrapped) return;
@@ -103,7 +108,7 @@ export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
     const nx = player.x + dx;
     const ny = player.y + dy;
 
-    // Map switch
+    // マップ切り替え判定
     if (nx < 0 && mapIndex > 0) {
       setMapIndex(mapIndex - 1);
       setPlayer({ x: MAPS[mapIndex - 1].data[0].length - 2, y: player.y, dir: "left" });
@@ -117,9 +122,11 @@ export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
       return;
     }
 
+    // 移動判定
     if (currentGrid[ny]) {
       const tileType = currentGrid[ny][nx];
       
+      // 障害物と穴
       if (tileType !== 1 && tileType !== TILE_OPEN_HOLE) {
         setPlayer({ x: nx, y: ny, dir: newDir });
         
@@ -132,7 +139,7 @@ export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
         if (tileType === 3) {
           if (onTrap) onTrap();
           const newGrid = currentGrid.map(row => [...row]);
-          newGrid[ny][nx] = TILE_OPEN_HOLE; 
+          newGrid[ny][nx] = TILE_OPEN_HOLE; // 穴を開ける
           setCurrentGrid(newGrid);
         }
       } else {
@@ -141,7 +148,10 @@ export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
     }
   }
 
-  // Key input
+
+  // 入力・描画の副作用
+
+  // キーボード入力
   useEffect(() => {
     const handleKey = (e) => {
       if (isTrapped) return;
@@ -154,7 +164,7 @@ export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [player, mapIndex, isTrapped, currentGrid]); 
 
-  // Draw
+  // Canvas描画処理
   useEffect(() => {
     if (!imagesLoaded) return;
     const canvas = canvasRef.current;
@@ -163,6 +173,7 @@ export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
 
     const currentMapId = MAPS[mapIndex].id;
 
+    // マップごとの画像切り替え
     let floorImg, edgeImg;
     if (currentMapId === "mountain") {
       floorImg = rockloadImg;
@@ -177,18 +188,21 @@ export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // タイル描画ループ
     currentGrid.forEach((row, y) => {
       row.forEach((tile, x) => {
         let img = floorImg;
         if (tile === 1) img = edgeImg;
         ctx.drawImage(img, x * TILE, y * TILE, TILE, TILE);
         
+        // アイテム地点の強調
         if (tile === 2) {
             ctx.strokeStyle = "yellow";
             ctx.lineWidth = 2;
             ctx.strokeRect(x * TILE + 5, y * TILE + 5, TILE - 10, TILE - 10);
         }
 
+        // 罠・穴の描画
         if (tile === 3 || tile === 4) {
           const isOpen = (tile === 4);
           const isStepping = (x === player.x && y === player.y && isTrapped);
@@ -207,7 +221,7 @@ export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
       });
     });
 
-    // Player rotation
+    // プレイヤー描画
     const drawPlayerRotated = () => {
       const cx = player.x * TILE + TILE / 2;
       const cy = player.y * TILE + TILE / 2;
@@ -230,6 +244,7 @@ export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
 
   }, [player, imagesLoaded, mapIndex, isTrapped, currentGrid]);
 
+  // JSX
   return (
     <div style={{ textAlign: "center", paddingBottom: "20px" }}>
       <canvas
@@ -264,6 +279,7 @@ export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
   );
 }
 
+// スタイル
 const btnStyle = {
   width: "60px",
   height: "60px",
