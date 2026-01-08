@@ -349,9 +349,12 @@ export default function App() {
           <div className="modal-overlay">
             <div className="modal-content">
               <h2>遊び方</h2>
-              <p>ログインしてタイムアタックに挑戦！</p>
-              <p>クリアタイムは世界ランキングに登録されます。</p>
-              <p>※ゲストプレイ時は記録されません</p>
+              <p1>キャラクターを操作して世界を探検しよう！</p1>
+              <p>キャラクターは矢印キー、wsad、下部のボタンで操作できるぞ！</p>
+              <p>特定の場所に行くと探索ができ、アイテムをゲットできる！</p>
+              <p>全てのアイテムを集めて図鑑を完成させよう！</p>
+              <p>落とし穴に落ちるとしばらく動けなくなるので注意！</p>
+              <p>ログインすると、全てのユーザーとタイムを競える！</p>
               <button onClick={() => setShowDescription(false)}>閉じる</button>
             </div>
           </div>
