@@ -23,9 +23,9 @@ const playSound = (audioObj) => {
 };
 
 const ITEM_DATA = {
-  field:  ["薬草", "石ころ", "謎の種"],
-  forest: ["キノコ", "カブトムシ", "きれいな花"],
-  mountain: ["秘石", "化石", "伝説の剣"],
+  field:  ["薬草", "石ころ", "謎の種","財布の落とし物"],
+  forest: ["キノコ", "カブトムシ", "きれいな花","カッコいい木の枝"],
+  mountain: ["秘石", "化石", "古の剣","輝く原石"],
 };
 
 const ALL_ITEMS = [
