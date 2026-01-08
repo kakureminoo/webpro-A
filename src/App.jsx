@@ -9,16 +9,14 @@ import { onAuthStateChanged } from "firebase/auth";
 import "./App.css";
 import ResetRanking from "./reset.jsx";
 
-
-// ▼ 効果音の読み込み (Trap音を追加)
+// SE
 const audioExplore = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
 const audioClear   = new Audio("https://actions.google.com/sounds/v1/cartoon/clank_car_crash.ogg");
-const audioTrap    = new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg"); // 追加
+const audioTrap    = new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg");
 
 audioExplore.volume = 0.5;
 audioClear.volume = 0.5;
-audioTrap.volume = 0.5; // 追加
-
+audioTrap.volume = 0.5;
 
 const playSound = (audioObj) => {
   audioObj.currentTime = 0;
@@ -198,19 +196,15 @@ export default function App() {
     }
   }
 
-  // ▼ 落とし穴イベント用の関数
+  // 罠
   function handleTrap() {
-    // すでに罠にかかっている最中なら何もしない（連打防止）
     if (isTrapped) return;
 
-    // 1. 効果音
     playSound(audioTrap);
     
-    // 2. スタン開始 & 演出ON
     setIsTrapped(true); 
-    showToast("💦 落とし穴！しばらく動けない！");
+    showToast("落とし穴！しばらく動けない！");
 
-    // 3. 0.5秒後にスタン解除
     setTimeout(() => {
       setIsTrapped(false);
     }, 500);
@@ -353,11 +347,9 @@ export default function App() {
 
   return (
     <div>
-      {/* 罠にかかった時だけ赤いオーバーレイを表示 */}
       {isTrapped && <div className="trap-overlay" />}
 
       <div className="game-header">
-        {/* ...ヘッダーの中身はそのまま... */}
         <div className="player-info">
           {user?.photoURL && <img src={user.photoURL} alt="icon" style={{width:24, borderRadius:'50%', verticalAlign:'middle', marginRight:5}}/>}
           <span>{nickname}</span>
@@ -371,7 +363,6 @@ export default function App() {
       </div>
 
       {gamePhase === "clear" && (
-         /* ...クリア画面そのまま... */
          <div className="clear-message">
           <h2>🎉 CONGRATULATIONS! 🎉</h2>
           <p>記録: {formatTime(currentTime)}</p>
@@ -382,19 +373,15 @@ export default function App() {
         </div>
       )}
 
-      {/* ▼ 画面揺れ演出のクラス (.shake-screen) を条件付きで付与 
-        ▼ Mapコンポーネントに isTrapped を渡す
-      */}
       <div className={isTrapped ? "shake-screen" : ""}>
         <Map 
           onReach={setCanExplore} 
           onMapChange={setCurrentMapId} 
           onTrap={handleTrap}
-          isTrapped={isTrapped} // これを追加！
+          isTrapped={isTrapped}
         />
       </div>
 
-      {/* ...以下、ボタンや図鑑などはそのまま... */}
       <div style={{ height: "60px", margin: "10px" }}>
         {gamePhase === "playing" && canExplore && !isTrapped && (
           <button onClick={explore} className="btn-explore">

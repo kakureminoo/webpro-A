@@ -1,5 +1,4 @@
 import { useState } from "react";
-// ▼▼▼ パスを修正しました（同じフォルダにある想定） ▼▼▼
 import { db } from "./firebase"; 
 import { collection, getDocs, writeBatch } from "firebase/firestore";
 
@@ -19,8 +18,6 @@ export default function ResetRanking() {
 
     try {
       const batch = writeBatch(db);
-      // コレクション名が "scores" か "ranking" か確認してください。
-      // あなたのApp.jsを見ると "scores" を使っているので "scores" に合わせます。
       const querySnapshot = await getDocs(collection(db, "scores")); 
 
       if (querySnapshot.empty) {

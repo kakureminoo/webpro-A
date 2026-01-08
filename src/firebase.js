@@ -1,8 +1,5 @@
 import { initializeApp } from "firebase/app";
 
-// ▼ ここで自分自身 (./firebase) をインポートしてはいけません。削除しました。
-
-// 必要な機能をFirebase SDKから直接インポートします
 import { 
   getAuth, 
   GoogleAuthProvider, 
@@ -22,7 +19,7 @@ import {
   doc, 
   getDoc, 
   setDoc,
-  writeBatch // reset.jsxで使用するため追加しておくと便利です
+  writeBatch
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -35,13 +32,11 @@ const firebaseConfig = {
   measurementId: "G-067NQE1HMZ"
 };
 
-// 初期化
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-const db = getFirestore(app); // ここでdbを定義します
+const db = getFirestore(app);
 
-// まとめてエクスポート
 export { 
   auth, 
   provider, 

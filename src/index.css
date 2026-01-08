@@ -1,10 +1,8 @@
-/* index.css */
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  /* 文字色を濃いグレー、背景を白に設定 */
   color: #213547;
   background-color: #ffffff;
 
@@ -27,7 +25,6 @@ h1 {
   line-height: 1.1;
 }
 
-/* ボタンの基本スタイル */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -35,11 +32,11 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #f9f9f9; /* 明るいグレー */
-  color: #213547;           /* 暗い文字 */
+  background-color: #f9f9f9;
+  color: #213547;
   cursor: pointer;
   transition: border-color 0.25s;
-  border: 1px solid #ccc;   /* 境界線を追加 */
+  border: 1px solid #ccc;
 }
 button:hover {
   border-color: #c6c8ea;

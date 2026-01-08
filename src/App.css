@@ -1,10 +1,7 @@
-/* App.css - ライトモード版 */
-
-/* === 全体のレイアウト === */
 :root {
   font-family: 'Helvetica Neue', Arial, sans-serif;
-  background-color: #ffffff; /* 白背景 */
-  color: #213547;            /* 濃い文字色 */
+  background-color: #ffffff;
+  color: #213547;
 }
 
 body {
@@ -24,7 +21,7 @@ body {
   align-items: center;
 }
 
-/* === スタート画面 === */
+/* スタート画面 */
 .start-screen {
   display: flex;
   flex-direction: column;
@@ -38,12 +35,10 @@ body {
   font-size: 4em;
   margin-bottom: 60px;
   color: #000000;
-  /* 影を薄いグレーに変更 */
   text-shadow: 2px 2px 0px #ddd;
   line-height: 1.1;
 }
 
-/* ボタンコンテナ */
 .menu-buttons {
   display: flex;
   flex-direction: column;
@@ -52,7 +47,6 @@ body {
   max-width: 300px;
 }
 
-/* === ボタン共通デザイン修正 === */
 button {
   cursor: pointer;
   padding: 12px 24px;
@@ -68,29 +62,28 @@ button:active {
   transform: scale(0.96);
 }
 
-/* スタートボタン */
+/* スタートBTN */
 .btn-primary {
   font-size: 1.5em;
   background-color: #646cff;
-  color: white; /* ここは白文字のまま */
+  color: white; 
   border: none;
 }
 .btn-primary:hover {
   background-color: #535bf2;
 }
 
-/* 概要ボタン */
 .btn-secondary {
   font-size: 1.2em;
-  background-color: #f0f0f0; /* 薄いグレー */
-  color: #333;               /* 濃い文字 */
+  background-color: #f0f0f0;
+  color: #333;
   border: 1px solid #ccc;
 }
 .btn-secondary:hover {
   background-color: #e0e0e0;
 }
 
-/* 探索ボタン */
+/* 探索BTN */
 .btn-explore {
   font-size: 1.2em;
   background-color: #ffcc00;
@@ -103,14 +96,14 @@ button:active {
   background-color: #ffd633;
 }
 
-/* === モーダル（説明画面） === */
+/* モーダル */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* 背景を少し明るく */
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -118,14 +111,14 @@ button:active {
 }
 
 .modal-content {
-  background: #ffffff; /* 白背景 */
+  background: #ffffff;
   padding: 40px;
   border-radius: 12px;
   max-width: 400px;
   border: 2px solid #646cff;
-  color: #333; /* 濃い文字 */
+  color: #333;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2); /* 影を追加 */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 .modal-content h2 {
   margin-top: 0;
@@ -142,12 +135,12 @@ button:active {
   margin: 0 auto;
 }
 
-/* === ゲームクリア表示 === */
+/* クリア画面 */
 .clear-message {
   border: 4px solid gold;
   padding: 20px;
   margin: 20px auto;
-  background-color: #fff9c4; /* 薄い黄色 */
+  background-color: #fff9c4;
   color: #333;
   border-radius: 8px;
   animation: pop 0.5s ease-out;
@@ -159,7 +152,7 @@ button:active {
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* === 図鑑リスト === */
+/* 図鑑 */
 .item-list {
   display: flex;
   flex-wrap: wrap;
@@ -189,12 +182,12 @@ button:active {
 }
 
 .item-card.unknown {
-  background: #e0e0e0; /* 薄いグレー */
-  color: #999;        /* 薄い文字 */
+  background: #e0e0e0;
+  color: #999;
   border-color: #ccc;
 }
 
-/* === ログイン・入力エリア === */
+/* ログイン */
 .login-box {
   margin-bottom: 20px;
   text-align: center;
@@ -205,8 +198,8 @@ button:active {
   font-size: 1.2rem;
   border-radius: 8px;
   border: 2px solid #ccc;
-  background-color: #fff; /* 白背景 */
-  color: #333;            /* 濃い文字 */
+  background-color: #fff;
+  color: #333;
   text-align: center;
   width: 250px;
   margin-bottom: 10px;
@@ -217,9 +210,9 @@ button:active {
   border-color: #646cff;
 }
 
-/* === ヘッダー情報 === */
+/* ヘッダー */
 .game-header {
-  background-color: #f9f9f9; /* 明るいグレー */
+  background-color: #f9f9f9;
   padding: 10px 20px;
   border-radius: 8px;
   margin-bottom: 15px;
@@ -244,10 +237,10 @@ button:active {
 }
 
 .time-value {
-  color: #e65100; /* オレンジ系で目立たせる */
+  color: #e65100;
 }
 
-/* === ボタン追加分 === */
+/* 追加BTN */
 .btn-google {
   background-color: #4285F4;
   color: white;
@@ -271,23 +264,23 @@ button:active {
   background-color: #ddd;
 }
 
-/* === ランキングボード === */
+/* ランキング */
 .ranking-board {
-  background: #ffffff; /* 白背景 */
+  background: #ffffff;
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 15px;
   width: 100%;
   max-width: 400px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* 影を追加 */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .ranking-board h3 {
   margin-top: 0;
   border-bottom: 1px solid #eee;
   padding-bottom: 10px;
-  color: #d4af37; /* ゴールド（少し暗めに） */
+  color: #d4af37;
 }
 
 .ranking-board ul {
@@ -309,9 +302,9 @@ button:active {
   font-weight: bold;
   width: 40px;
 }
-.ranking-board li:nth-child(1) .rank { color: #d4af37; } /* Gold */
-.ranking-board li:nth-child(2) .rank { color: #a9a9a9; } /* Silver */
-.ranking-board li:nth-child(3) .rank { color: #cd7f32; } /* Bronze */
+.ranking-board li:nth-child(1) .rank { color: #d4af37; }
+.ranking-board li:nth-child(2) .rank { color: #a9a9a9; }
+.ranking-board li:nth-child(3) .rank { color: #cd7f32; }
 
 .name {
   flex-grow: 1;
@@ -329,13 +322,13 @@ button:active {
   color: #333;
 }
 
-/* === ニックネームフォーム === */
+/* ニックネーム */
 .nickname-form {
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 10px;
-  background-color: #f5f5f5; /* 背景を薄いグレーに */
+  background-color: #f5f5f5;
   border-radius: 5px;
   border: 1px solid #ddd;
 }
@@ -355,13 +348,13 @@ button:active {
   font-weight: bold;
 }
 
-/* トースト通知 */
+/* トースト */
 .toast-notification {
   position: fixed;
   top: 30px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #333; /* トーストは黒背景のままにして目立たせる */
+  background-color: #333;
   color: white;
   padding: 12px 24px;
   border-radius: 25px;
@@ -375,9 +368,9 @@ button:active {
   from { opacity: 0; transform: translate(-50%, -20px); }
   to   { opacity: 1; transform: translate(-50%, 0); }
 }
-/* === トラップ演出 === */
 
-/* 画面を激しく揺らす */
+/* トラップ */
+/* 揺れ */
 .shake-screen {
   animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
 }
@@ -389,16 +382,16 @@ button:active {
   40%, 60% { transform: translate3d(6px, 0, 0); }
 }
 
-/* 画面を一瞬赤くするオーバーレイ */
+/* 赤オーバーレイ */
 .trap-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 0, 0, 0.3); /* 半透明の赤 */
+  background-color: rgba(255, 0, 0, 0.3);
   z-index: 9999;
-  pointer-events: none; /* クリックを邪魔しないようにする */
+  pointer-events: none; /* クリック透過 */
   animation: fadeOut 0.5s forwards;
 }
 
