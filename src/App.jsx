@@ -219,7 +219,7 @@ export default function App() {
     showToast("落とし穴！しばらく動けない！");
     setTimeout(() => {
       setIsTrapped(false);
-    }, 500);
+    }, 3000);
   }
 
   async function finishGame() {

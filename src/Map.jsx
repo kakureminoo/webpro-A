@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import grassedgeImgSrc from "./assets/grassedge.png";
 import grassloadImgSrc from "./assets/grassload.png";
-import playerImgSrc from "./assets/player.png";
 import rockloadImgSrc from "./assets/rockload.png";
 import rockedgeImgSrc from "./assets/rockedge.png";
-
+import treeImgSrc from "./assets/tree.png";
+import dropImgSrc from "./assets/drop.png";
+import playerUpSrc    from "./assets/player_up.png";
+import playerDownSrc  from "./assets/player_down.png";
+import playerLeftSrc  from "./assets/player_left.png";
+import playerRightSrc from "./assets/player_right.png";
 const TILE = 40;
 const TILE_OPEN_HOLE = 4;
 
@@ -12,8 +16,12 @@ const grassedgeImg = new Image(); grassedgeImg.src = grassedgeImgSrc;
 const grassloadImg = new Image(); grassloadImg.src = grassloadImgSrc;
 const rockedgeImg = new Image();  rockedgeImg.src = rockedgeImgSrc;
 const rockloadImg = new Image();  rockloadImg.src = rockloadImgSrc;
-const playerImg = new Image();    playerImg.src = playerImgSrc;
-
+const treeImg      = new Image(); treeImg.src = treeImgSrc;
+const dropImg      = new Image(); dropImg.src = dropImgSrc;
+const playerUpImg    = new Image(); playerUpImg.src = playerUpSrc;
+const playerDownImg  = new Image(); playerDownImg.src = playerDownSrc;
+const playerLeftImg  = new Image(); playerLeftImg.src = playerLeftSrc;
+const playerRightImg = new Image(); playerRightImg.src = playerRightSrc;
 const MAPS = [
   {
     id: "field",
@@ -21,11 +29,11 @@ const MAPS = [
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,2,0,1,1,0,1,0,2,0,1,0,1],
-      [1,0,3,0,0,0,0,1,0,0,0,1,0,1],
+      [1,0,3,0,0,0,0,1,0,3,0,1,0,1],
       [1,1,0,1,1,0,1,1,0,1,0,1,0,1],
       [1,0,0,0,1,0,0,0,0,1,0,0,0,1],
-      [1,0,1,0,0,0,1,0,0,0,0,1,0,0],
-      [1,0,0,0,1,0,0,0,1,0,2,0,0,1],
+      [1,0,1,0,0,0,1,3,0,0,0,1,0,0],
+      [1,0,3,0,1,0,0,0,1,3,2,0,0,1],
       [1,0,0,1,1,0,3,0,0,0,0,0,0,1],
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     ],
@@ -75,7 +83,11 @@ export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
 
   useEffect(() => {
     let loadedCount = 0;
-    const images = [grassedgeImg, grassloadImg, rockedgeImg, rockloadImg, playerImg];
+   const images = [
+      grassedgeImg, grassloadImg, rockedgeImg, rockloadImg, 
+      treeImg, dropImg,
+      playerUpImg, playerDownImg, playerLeftImg, playerRightImg
+    ];
     const total = images.length;
     const checkLoad = () => {
       loadedCount++;
@@ -180,7 +192,7 @@ export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
       edgeImg = rockedgeImg;
     } else if (currentMapId === "forest") {
       floorImg = grassloadImg;
-      edgeImg = grassedgeImg;
+      edgeImg = treeImg;
     } else {
       floorImg = grassloadImg;
       edgeImg = grassedgeImg;
@@ -222,25 +234,21 @@ export default function Map({ onReach, onMapChange, onTrap, isTrapped }) {
     });
 
     // プレイヤー描画
-    const drawPlayerRotated = () => {
-      const cx = player.x * TILE + TILE / 2;
-      const cy = player.y * TILE + TILE / 2;
-      
-      ctx.save();
-      ctx.translate(cx, cy);
-      
-      let angle = 0;
-      if (player.dir === "up")    angle = Math.PI; 
-      if (player.dir === "down")  angle = 0;
-      if (player.dir === "left")  angle = Math.PI / 2;
-      if (player.dir === "right") angle = -Math.PI / 2;
-      
-      ctx.rotate(angle);
-      ctx.drawImage(playerImg, -TILE / 2, -TILE / 2, TILE, TILE);
-      ctx.restore();
+    const drawPlayer = () => {
+      const px = player.x * TILE;
+      const py = player.y * TILE;
+
+      let currentImg = playerDownImg; // デフォルト
+      if (player.dir === "up")    currentImg = playerUpImg;
+      if (player.dir === "down")  currentImg = playerDownImg;
+      if (player.dir === "left")  currentImg = playerLeftImg;
+      if (player.dir === "right") currentImg = playerRightImg;
+
+
+      ctx.drawImage(currentImg, px, py, TILE, TILE);
     };
 
-    drawPlayerRotated();
+    drawPlayer();
 
   }, [player, imagesLoaded, mapIndex, isTrapped, currentGrid]);
 
